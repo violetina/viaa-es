@@ -1,0 +1,209 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: avo-elasticsearch
+objects:
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    creationTimestamp: null
+    generation: 3
+    labels:
+      component: elasticsearch-${ENV}
+      role: master
+    name: es-cluster-${ENV}
+  spec:
+    podManagementPolicy: OrderedReady
+    replicas: 3
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        component: elasticsearch-${ENV}
+        role: master
+    serviceName: elasticsearch-${ENV}
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          component: elasticsearch-${ENV}
+          role: master
+      spec:
+        containers:
+        - env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          - name: ES_PLUGINS_INSTALL
+            value: ${matchboxuri}
+          - name: CLUSTER_NAME
+            value: avo-es-${ENV}
+          - name: NODE_MASTER
+            value: "true"
+          - name: NODE_INGEST
+            value: "true"
+          - name: HTTP_ENABLE
+            value: "true"
+          - name: ES_JAVA_OPTS
+            value: -Xms1000m -Xmx1000m
+          - name: PROCESSORS
+            value: "2"
+          - name:  DISCOVERY_SERVICE
+            value: "elasticsearch-discovery-${ENV}"
+          image: quay.io/pires/docker-elasticsearch-kubernetes:6.4.2
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: transport
+            timeoutSeconds: 1
+          name: es-cluster-${ENV}
+          ports:
+          - containerPort: 9200
+            name: http
+            protocol: TCP
+          - containerPort: 9300
+            name: transport
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /_cluster/health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: {}
+          securityContext:
+            capabilities:
+              add:
+              - IPC_LOCK
+              - SYS_RESOURCE
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data
+            name: es-storage
+          - mountPath: /home/elasticsearch/.thematchbox/theMatchBox-VIAA_Demo.lic
+            name: matchbox-lic
+            subPath: theMatchBox-VIAA_Demo.lic
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - /bin/sh
+          - -c
+          - sysctl -w vm.max_map_count=262144 && mkdir -p /home/elasticsearch/.thematchbox
+            && chmod 777  /home/elasticsearch/.thematchbox
+          image: busybox:1.27.2
+          imagePullPolicy: IfNotPresent
+          name: init-sysctl
+          resources: {}
+          securityContext:
+            capabilities:
+              add:
+              - IPC_LOCK
+              - SYS_RESOURCE
+            privileged: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: matchbox-lic
+          name: matchbox-lic
+    updateStrategy:
+      rollingUpdate:
+        partition: 0
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - metadata:
+        creationTimestamp: null
+        name: es-storage
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 12Gi
+        storageClassName: vsphere-standard
+      status:
+        phase: Pending
+  status:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    labels:
+      component: elasticsearch-${ENV}
+      role: master
+    name: elasticsearch-ingest-${ENV}
+  spec:
+    ports:
+    - name: http
+      port: 9200
+      protocol: TCP
+      targetPort: 9200
+    selector:
+      component: elasticsearch-${ENV}
+      role: master
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    labels:
+      component: elasticsearch-${ENV}
+      role: master
+    name: elasticsearch-discovery-${ENV}
+  spec:
+    clusterIP: None
+    ports:
+    - name: transport
+      port: 9300
+      protocol: TCP
+      targetPort: 9300
+    selector:
+      component: elasticsearch-${ENV}
+      role: master
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  data:
+    theMatchBox-VIAA_Demo.lic: ${licensekey}
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: null
+    name: matchbox-lic
+
+parameters:
+  - name: ENV
+    value: "qas"
+  - name: licensekey 
+    displayName: Matchbox license key 
+    description: String with the key
+    required: true 
+  - name: matchboxuri
+    description: where to get the plugin
+    value: "http://repo.do.viaa.be/TheMatchBox-PluginES6-2.0-beta-3.zip"
+    required: true
