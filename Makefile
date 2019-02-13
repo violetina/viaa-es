@@ -1,4 +1,5 @@
 PROJECT=viaa-es
+APP_NAME=viaa-es
 WD=/tmp
 REPO_URI=https://github.com/violetina/viaa-es.git
 GIT_NAME=viaa-es.git
@@ -41,7 +42,7 @@ clone:
 	cd /tmp && git clone  --single-branch -b ${BRANCH} "${REPO_URI}" 
 buildimage:
 	cd /tmp/${GIT_NAME}
-	docker build -t ${oc_registry}/${OC_PROJECT}/${APP_NAME}:${APP}-${TAG} .
+	docker build -t ${oc_registry}/${OC_PROJECT}/${APP_NAME}:${TAG} .
 push:
 	docker push ${oc_registry}/${OC_PROJECT}/${APP_NAME}:${APP}-${TAG}
 deploy:
