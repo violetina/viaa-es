@@ -26,15 +26,14 @@ commit:
 	git commit -a
 	git push
 checkTools:
-	if [ -x "${path_to_executable}" ]; then  echo "OC tools found here: ${path_to_executable}"; else echo please install the oc tools: 
-https://github.com/openshiftorigin/releases/tag/v3.9.0; fi; uname && netstat | grep docker| grep -e CONNECTED  1> /dev/null || echo docker not running or not using linux
+	if [ -x "${path_to_executable}" ]; then  echo "OC tools found here: ${path_to_executable}"; else echo please install the oc tools: https://github.com/openshiftorigin/releases/tag/v3.9.0; fi; uname && netstat | grep docker| grep -e CONNECTED  1> /dev/null || echo docker not running or not using linux
 login:	check-env
 	oc login do-prd-okp-m0.do.viaa.be:8443
 	oc project "${OC_PROJECT}" ||  oc new-project "${OC_PROJECT}"
 	#oc adm policy add-scc-to-user anyuid system:serviceaccount:${OC_PROJECT}:default --as system:admin --as-group system:admins -n ${APP_NAME}
 	#openshift.io/sa.scc.uid-range: 8983/1
 	#oc edit namespace solr-${ENV}
-	#oc adm policy add-scc-to-user privileged -n ${OC_PROJECT} -z default
+	oc adm policy add-scc-to-user privileged -n ${OC_PROJECT} -z default
 	docker login -p "${TOKEN}" -u unused ${oc_registry}
 #	oc get imagestream  "${OC_PROJECT}" || oc create imagestream  "${OC_PROJECT}"
 
@@ -42,7 +41,7 @@ clone:
 	cd /tmp && git clone  --single-branch -b ${BRANCH} "${REPO_URI}" 
 buildimage:
 	cd /tmp/${GIT_NAME}
-	docker build --build-arg  APP=${APP} -t ${oc_registry}/${OC_PROJECT}/${APP_NAME}:${APP}-${TAG} .
+	docker build -t ${oc_registry}/${OC_PROJECT}/${APP_NAME}:${APP}-${TAG} .
 push:
 	docker push ${oc_registry}/${OC_PROJECT}/${APP_NAME}:${APP}-${TAG}
 deploy:
