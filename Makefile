@@ -18,7 +18,7 @@ check-env:
 ifndef ENV
   ENV=prd
 endif
-OC_PROJECT=temtest
+OC_PROJECT=temptest
 ifndef BRANCH
   BRANCH=master
 endif
@@ -44,7 +44,7 @@ buildimage:
 	cd /tmp/${GIT_NAME}
 	docker build -t ${oc_registry}/${OC_PROJECT}/${APP_NAME}:${TAG} .
 push:
-	docker push ${oc_registry}/${OC_PROJECT}/${APP_NAME}:${APP}-${TAG}
+	docker push ${oc_registry}/${OC_PROJECT}/${APP_NAME}:${TAG}
 deploy:
 	oc create -f openshift/es-cluster-tmpl.yaml
 clean:
