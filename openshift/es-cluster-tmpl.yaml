@@ -57,7 +57,7 @@ objects:
             value: "2"
           - name:  DISCOVERY_SERVICE
             value: "elasticsearch-discovery-${ENV}"
-          image: quay.io/pires/docker-elasticsearch-kubernetes:6.4.2
+          image: docker-registry.default.svc:5000/temptest/viaa-es@sha256:58b6aadb0ef8cd943e18c1cf9a7050a8821f0ddaa447d0ef8e6adb056b30e9aa
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
