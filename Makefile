@@ -53,6 +53,6 @@ podshell:
 	oc exec -ti `oc get pods | grep solr | cut -d ' ' -f 1 |grep -v deplo`  bash
 delete:
 	oc delete dc/solr-${ENV}
-all:	clean login  buildyaml commit clone buildimage push deploy clean
+all:	clean login commit clone buildimage push deploy clean
 
 
