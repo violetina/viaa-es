@@ -57,7 +57,7 @@ objects:
             value: "2"
           - name:  DISCOVERY_SERVICE
             value: "elasticsearch-discovery-${ENV}"
-          image: docker-registry.default.svc:5000/temptest/viaa-esprd
+          image: docker-registry.default.svc:5000/temptest/viaa-es:prd
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
