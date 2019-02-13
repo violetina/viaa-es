@@ -140,7 +140,7 @@ objects:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 12Gi
+            storage: 2Gi
         storageClassName: vsphere-standard
       status:
         phase: Pending
@@ -206,4 +206,4 @@ parameters:
   - name: matchboxuri
     description: where to get the plugin
     value: "http://repo.do.viaa.be/TheMatchBox-PluginES6-2.0-beta-3.zip"
-    required: true
+    required: false
