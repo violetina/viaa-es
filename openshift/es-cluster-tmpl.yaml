@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Template
 metadata:
   creationTimestamp: null
-  name: viaa-elasticsearch
+  name: avo-es-6.6.0
 objects:
 - apiVersion: apps/v1
   kind: StatefulSet
@@ -57,7 +57,7 @@ objects:
             value: "2"
           - name:  DISCOVERY_SERVICE
             value: "elasticsearch-discovery-${ENV}"
-          image: docker-registry.default.svc:5000/temptest/viaa-es:prd
+          image: docker-registry.default.svc:5000/sc-avo2/viaa-es:prd
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -140,7 +140,7 @@ objects:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 2Gi
+            storage: 9Gi
         storageClassName: vsphere-standard
       status:
         phase: Pending
@@ -202,8 +202,8 @@ parameters:
   - name: licensekey 
     displayName: Matchbox license key 
     description: String with the key
-    required: true 
+    required: false 
   - name: matchboxuri
     description: where to get the plugin
-    value: "http://repo.do.viaa.be/TheMatchBox-PluginES6-2.0-beta-3.zip"
+    value: "https://nexus.thematchbox.be/repository/maven-releases/be/thematchbox/TheMatchBox-Plugin-ES/2.0-beta-4/TheMatchBox-Plugin-ES-2.0-beta-4-6.6.0.zip"
     required: false

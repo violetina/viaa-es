@@ -1,5 +1,5 @@
-PROJECT=viaa-es
-APP_NAME=viaa-es
+PROJECT=sc-avo
+APP_NAME=es
 WD=/tmp
 REPO_URI=https://github.com/violetina/viaa-es.git
 GIT_NAME=viaa-es.git
