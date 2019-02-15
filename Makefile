@@ -1,4 +1,4 @@
-PROJECT=sc-avo
+PROJECT=sc-avo2
 APP_NAME=es
 WD=/tmp
 REPO_URI=https://github.com/violetina/viaa-es.git
@@ -18,7 +18,7 @@ check-env:
 ifndef ENV
   ENV=prd
 endif
-OC_PROJECT=temptest
+OC_PROJECT=sc-avo2
 ifndef BRANCH
   BRANCH=master
 endif
