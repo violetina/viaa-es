@@ -4,10 +4,6 @@ WD=/tmp
 REPO_URI=https://github.com/violetina/viaa-es.git
 GIT_NAME=viaa-es.git
 TAG=${ENV}
-#compose.yaml  data-persistentvolumeclaim.yaml  solr-deploymentconfig.yaml  solr-imagestream.yaml  solr-service.yaml
-#slaafje=`oc get pods | grep slaafje | cut -d ' ' -f 1 `
-podname=`oc get pods | grep solr | cut -d ' ' -f 1 |grep -v deploy`
-#set_policy=set_policy ha-fed ".*" '{"ha-mode":"all"}' --priority 1 --apply-to queues
 TOKEN=`oc whoami -t`
 path_to_oc=`which oc`
 oc_registry=docker-registry-default.apps.do-prd-okp-m0.do.viaa.be
